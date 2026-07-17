@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Scale Generator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="mark" aria-hidden="true"></div>
+        <strong>Color</strong>
+      </div>
+      <nav class="topnav" aria-label="Primary">
+        <span class="is-active">Generate</span>
+      </nav>
+      <div class="topbar-actions">
+        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+          <span class="theme-switch" aria-hidden="true"><span class="theme-switch-thumb"></span></span>
+          <span class="theme-icon" aria-hidden="true">☾</span>
+          <span class="theme-label">Dark</span>
+        </button>
+      </div>
+    </header>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <header class="brand-block">
+          <h1>Color Generator</h1>
+          <p>Create and visualize color scales for components and design systems.</p>
+        </header>
+
+        <section class="panel">
+          <div class="section-title">
+            <span>Brand</span>
+            <span id="scaleCount">0</span>
+          </div>
+          <form id="addForm" class="add-form" novalidate>
+            <input id="nameInput" type="text" placeholder="Name" value="New Color" />
+            <div class="hex-row">
+              <input id="hexInput" type="text" placeholder="#8b5cf6" autocomplete="off" />
+              <button class="icon-button" type="submit" title="Add color">Add</button>
+            </div>
+            <p id="hexError" class="error-text" hidden>Enter a valid hex color.</p>
+          </form>
+          <div class="action-row">
+            <button id="sortNameButton" type="button">Sort A-Z</button>
+            <button id="sortHueButton" type="button">Sort Hue</button>
+          </div>
+          <label class="upload-button">
+            <input id="imageInput" type="file" accept="image/*" />
+            Extract from image
+          </label>
+          <div id="imageColors" class="image-colors" aria-live="polite"></div>
+        </section>
+
+        <section class="scale-list" id="scaleList" aria-label="Color scales"></section>
+      </aside>
+
+      <main class="workspace">
+        <header class="toolbar">
+          <div class="tabs" role="tablist" aria-label="Views">
+            <button class="tab is-active" data-view="theme" type="button">Theme colors</button>
+            <button class="tab" data-view="gradient" type="button">Gradient</button>
+          </div>
+          <div class="toolbar-controls">
+            <label class="control">
+              <span>Background</span>
+              <input id="backgroundInput" type="text" value="#ffffff" />
+            </label>
+            <label class="control">
+              <span>Copy</span>
+              <select id="copyFormat">
+                <option value="hex">HEX</option>
+                <option value="rgb">RGB</option>
+                <option value="hsl">HSL</option>
+                <option value="oklch">OKLCH</option>
+              </select>
+            </label>
+          </div>
+        </header>
+
+        <section class="hero-strip">
+          <div>
+            <p class="palette-label">Palette 1</p>
+            <h2 id="viewTitle">Theme colors</h2>
+            <p id="viewSubtitle">Each swatch includes its generated value and WCAG contrast against the selected background.</p>
+          </div>
+          <div class="export-row">
+            <button id="shareButton" type="button">Share link</button>
+            <button id="svgButton" type="button">SVG</button>
+            <button id="pngButton" type="button">PNG</button>
+            <button id="jsonButton" type="button">Figma JSON</button>
+          </div>
+        </section>
+
+        <section id="viewMount" class="view-mount" aria-live="polite"></section>
+      </main>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
