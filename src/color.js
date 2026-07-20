@@ -1,17 +1,31 @@
 export const STEPS = [95, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
 
 const TARGET_LIGHTNESS = {
-  95: 0.985,
-  100: 0.965,
-  200: 0.91,
-  300: 0.82,
-  400: 0.71,
-  500: 0.61,
-  600: 0.52,
-  700: 0.43,
-  800: 0.32,
-  900: 0.22,
-  950: 0.13,
+  95: 0.97,
+  100: 0.932,
+  200: 0.882,
+  300: 0.809,
+  400: 0.707,
+  500: 0.623,
+  600: 0.546,
+  700: 0.488,
+  800: 0.424,
+  900: 0.379,
+  950: 0.282,
+};
+
+const TARGET_CHROMA_RATIO = {
+  95: 0.057,
+  100: 0.131,
+  200: 0.241,
+  300: 0.429,
+  400: 0.673,
+  500: 0.873,
+  600: 1,
+  700: 0.992,
+  800: 0.812,
+  900: 0.596,
+  950: 0.371,
 };
 
 export function normalizeHex(value) {
@@ -77,13 +91,11 @@ export function formatColor(hex, format) {
 export function generateScale(baseHex) {
   const base = rgbToOklch(hexToRgb(baseHex));
   const seedStep = nearestStep(base.l);
+  const seedChromaRatio = TARGET_CHROMA_RATIO[seedStep] || 1;
 
   return Object.fromEntries(
     STEPS.map((step) => {
-      const distance = Math.abs(STEPS.indexOf(step) - STEPS.indexOf(seedStep));
-      const edgeTaper = step <= 100 ? 0.16 : step >= 900 ? 0.42 : step >= 800 ? 0.68 : 1;
-      const distanceBoost = Math.max(0.74, 1 - distance * 0.045);
-      const c = base.c * edgeTaper * distanceBoost;
+      const c = base.c * (TARGET_CHROMA_RATIO[step] / seedChromaRatio);
       const rgb = oklchToDisplayRgb({ l: TARGET_LIGHTNESS[step], c, h: base.h });
       const hex = rgbToHex(rgb);
       const hsl = rgbToHsl(rgb);

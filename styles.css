@@ -1476,3 +1476,25 @@ body[data-theme="dark"] .app-shell {
     grid-template-columns: repeat(4, 24px);
   }
 }
+
+/* Annotation update: color-card actions sit at the bottom and fill the card */
+.scale-card {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.scale-card-header {
+  width: 100%;
+}
+
+.card-actions {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  margin-top: 8px;
+}
+
+.card-actions button {
+  width: 100%;
+  min-height: 28px;
+}
