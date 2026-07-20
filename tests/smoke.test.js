@@ -15,6 +15,11 @@ const palette = {
   scales: [{ name: "Brand Purple", baseHex: "#8b5cf6", steps: scale }],
 };
 assert.match(paletteToSvg(palette), /<svg/);
-assert.equal(JSON.parse(paletteToDtcgJson(palette))["brand-purple"]["500"].$type, "color");
+const figmaTokens = JSON.parse(paletteToDtcgJson(palette));
+assert.equal(figmaTokens.color["brand-purple"]["500"].$type, "color");
+assert.equal(figmaTokens.color["brand-purple"]["500"].$value.colorSpace, "srgb");
+assert.equal(figmaTokens.color["brand-purple"]["500"].$value.components.length, 3);
+assert.equal(figmaTokens.color["brand-purple"]["500"].$value.alpha, 1);
+assert.match(figmaTokens.color["brand-purple"]["500"].$value.hex, /^#[0-9A-F]{6}$/);
 
 console.log("Smoke checks passed");

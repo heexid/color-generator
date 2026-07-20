@@ -28,20 +28,24 @@ export function paletteToSvg(palette) {
 }
 
 export function paletteToDtcgJson(palette) {
-  const tokens = {};
+  const tokens = {
+    color: {
+      $description: "Generated color scales for Figma Variables import",
+    },
+  };
   palette.scales.forEach((scale) => {
-    tokens[slug(scale.name)] = {
-      $type: "color",
+    tokens.color[slug(scale.name)] = {
       $description: `Generated from ${scale.baseHex}`,
     };
     STEPS.forEach((step) => {
-      tokens[slug(scale.name)][step] = {
+      const color = scale.steps[step];
+      tokens.color[slug(scale.name)][step] = {
         $type: "color",
-        $value: scale.steps[step].hex,
+        $value: figmaColorValue(color),
         $extensions: {
-          "figma.variable": {
-            collection: "Generated color scales",
-            mode: "Default",
+          "com.figma": {
+            hiddenFromPublishing: false,
+            scopes: ["ALL_SCOPES"],
           },
         },
       };
@@ -102,6 +106,23 @@ export function paletteToPngBlob(palette) {
 
 function slug(value) {
   return String(value).trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "color";
+}
+
+function figmaColorValue(color) {
+  return {
+    colorSpace: "srgb",
+    components: [
+      toFigmaChannel(color.rgb.r),
+      toFigmaChannel(color.rgb.g),
+      toFigmaChannel(color.rgb.b),
+    ],
+    alpha: 1,
+    hex: color.hex.toUpperCase(),
+  };
+}
+
+function toFigmaChannel(value) {
+  return Number((value / 255).toFixed(10));
 }
 
 function escapeXml(value) {
