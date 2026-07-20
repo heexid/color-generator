@@ -74,7 +74,7 @@ function bindEvents() {
     persistAndRender();
   });
 
-  elements.backgroundPickerInput.addEventListener("input", () => {
+  elements.backgroundPickerInput.addEventListener("change", () => {
     state.background = elements.backgroundPickerInput.value;
     elements.backgroundInput.value = state.background;
     updateBackgroundPickerSwatch();
@@ -216,7 +216,7 @@ function renderScaleList() {
       scale.steps = generateScale(hex);
       persistAndRender();
     });
-    card.querySelector(".scale-color-input").addEventListener("input", (event) => {
+    card.querySelector(".scale-color-input").addEventListener("change", (event) => {
       scale.baseHex = event.target.value;
       scale.steps = generateScale(scale.baseHex);
       persistAndRender();

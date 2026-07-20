@@ -10,7 +10,7 @@
     <header class="topbar">
       <div class="topbar-brand">
         <div class="mark" aria-hidden="true"></div>
-        <strong>Color</strong>
+        <strong>Color Generator</strong>
       </div>
       <nav class="topnav" aria-label="Primary">
         <span class="is-active">Generate</span>
@@ -26,7 +26,7 @@
     <div class="app-shell">
       <aside class="sidebar">
         <header class="brand-block">
-          <h1>Color Generator</h1>
+          <h1>Generate</h1>
           <p>Create and visualize color scales for components and design systems.</p>
         </header>
 
@@ -48,6 +48,7 @@
             <p id="hexError" class="error-text" hidden>Enter a valid hex color.</p>
           </form>
           <div class="action-row">
+            <p class="sidebar-subtitle">Tools</p>
             <button id="sortNameButton" type="button">Sort A-Z</button>
             <button id="sortHueButton" type="button">Sort Hue</button>
           </div>
@@ -58,6 +59,7 @@
           <div id="imageColors" class="image-colors" aria-live="polite"></div>
         </section>
 
+        <p class="sidebar-subtitle color-groups-title">Color groups</p>
         <section class="scale-list" id="scaleList" aria-label="Color scales"></section>
       </aside>
 
@@ -97,10 +99,10 @@
             <p id="viewSubtitle">Each swatch includes its generated value and WCAG contrast against the selected background.</p>
           </div>
           <div class="export-row">
-            <button id="shareButton" type="button">Share link</button>
+            <button id="shareButton" type="button">Share</button>
             <button id="svgButton" type="button">SVG</button>
             <button id="pngButton" type="button">PNG</button>
-            <button id="jsonButton" type="button">Figma JSON</button>
+            <button id="jsonButton" type="button">JSON</button>
           </div>
         </section>
 
