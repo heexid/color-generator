@@ -26,7 +26,7 @@ const elements = {
 
 const viewCopy = {
   theme: ["Theme colors", "Full 95-950 color scales. Scroll horizontally to inspect and copy each swatch."],
-  gradient: ["Gradient", "Five generated gradients plus one combined palette gradient from your added colors."],
+  gradient: ["Gradient", "Five gradients per color scale, plus one combined palette gradient from your added colors."],
 };
 
 bindEvents();
@@ -151,10 +151,10 @@ function renderScaleList() {
       </div>
       <div class="mini-preview">${STEPS.map((step) => `<span style="background:${scale.steps[step].hex}"></span>`).join("")}</div>
       <div class="card-actions">
-        <button type="button" data-action="up" title="Move up">Up</button>
-        <button type="button" data-action="down" title="Move down">Down</button>
-        <button type="button" data-action="copy" title="Copy base color">Copy</button>
-        <button type="button" data-action="delete" title="Delete">Del</button>
+        <button class="icon-only" type="button" data-action="up" title="Move up">${icon("arrowUp")}<span class="sr-only">Move up</span></button>
+        <button class="icon-only" type="button" data-action="down" title="Move down">${icon("arrowDown")}<span class="sr-only">Move down</span></button>
+        <button class="icon-only" type="button" data-action="copy" title="Copy base color">${icon("copy")}<span class="sr-only">Copy base color</span></button>
+        <button class="icon-only danger-action" type="button" data-action="delete" title="Delete">${icon("delete")}<span class="sr-only">Delete</span></button>
       </div>
     `;
     card.querySelector(".scale-name").addEventListener("change", (event) => {
@@ -195,7 +195,8 @@ function renderView() {
 }
 
 function renderTheme() {
-  elements.viewMount.innerHTML = `<div class="scale-scroll"><div class="theme-grid">
+  const canvasText = textColorForBackground(state.background);
+  elements.viewMount.innerHTML = `<div class="scale-scroll" style="--canvas-bg:${state.background};--canvas-text:${canvasText}"><div class="theme-grid">
     <div class="grid-header">Scale</div>
     ${STEPS.map((step) => `<div class="grid-header">${step}</div>`).join("")}
   </div></div>`;
@@ -222,8 +223,7 @@ function renderTheme() {
 }
 
 function renderGradient() {
-  const gradients = buildGradients();
-  if (!gradients.length) {
+  if (!state.scales.length) {
     elements.viewMount.innerHTML = `<div class="empty-state"><h3>Add a color scale to generate gradients</h3><p>Gradients are built from the colors in your palette.</p></div>`;
     return;
   }
@@ -234,13 +234,21 @@ function renderGradient() {
       <div class="gradient-toolbar">
         <div>
           <strong>Generated gradients</strong>
-          <p>Randomized from your added colors and their scale steps.</p>
+          <p>Each color scale gets five gradients using only its own generated steps.</p>
         </div>
-        <button id="randomGradientButton" type="button">Randomize</button>
+        <button id="randomGradientButton" class="soft-action" type="button">${icon("shuffle")}<span>Randomize</span></button>
       </div>
-      <section class="gradient-list">
-        ${gradients.map((gradient, index) => gradientCard(gradient, `Gradient ${index + 1}`)).join("")}
-      </section>
+      ${state.scales.map((scale, scaleIndex) => `
+        <section class="scale-gradient-section">
+          <div class="scale-gradient-heading">
+            <strong>${escapeHtml(scale.name)}</strong>
+            <span>${scale.baseHex}</span>
+          </div>
+          <div class="gradient-list">
+            ${buildScaleGradients(scale, scaleIndex).map((gradient, index) => gradientCard(gradient, `${scale.name} ${index + 1}`)).join("")}
+          </div>
+        </section>
+      `).join("")}
       <section class="combined-gradient">
         <div>
           <strong>Combined palette gradient</strong>
@@ -280,20 +288,20 @@ function gradientCard(gradient, name, wide = false) {
         <code>${escapedGradient}</code>
       </div>
       <div class="gradient-actions">
-        <button type="button" data-copy-gradient="${escapedGradient}">Copy</button>
-        <button type="button" data-download-gradient="${escapedGradient}" data-gradient-name="${escapeHtml(name.toLowerCase().replaceAll(" ", "-"))}">Download</button>
+        <button type="button" data-copy-gradient="${escapedGradient}">${icon("copy")}<span>Copy</span></button>
+        <button type="button" data-download-gradient="${escapedGradient}" data-gradient-name="${escapeHtml(name.toLowerCase().replaceAll(" ", "-"))}">${icon("download")}<span>Download</span></button>
       </div>
     </article>
   `;
 }
 
-function buildGradients() {
-  const colors = gradientSourceColors();
+function buildScaleGradients(scale, scaleIndex) {
+  const colors = gradientSourceColors(scale);
   if (colors.length < 2) return [];
-  const random = seededRandom(state.gradientSeed || 1);
+  const random = seededRandom((state.gradientSeed || 1) + scaleIndex * 97);
   return Array.from({ length: 5 }, (_, index) => {
     const angle = [90, 120, 135, 160, 210][index];
-    const stopCount = 2 + Math.floor(random() * Math.min(3, colors.length - 1));
+    const stopCount = 2 + Math.floor(random() * 2);
     const stops = [];
     while (stops.length < stopCount) {
       const color = colors[Math.floor(random() * colors.length)];
@@ -309,14 +317,14 @@ function buildCombinedGradient() {
   return `linear-gradient(135deg, ${colors.join(", ")})`;
 }
 
-function gradientSourceColors() {
-  return state.scales.flatMap((scale) => [
+function gradientSourceColors(scale) {
+  return [
     scale.steps[100].hex,
     scale.steps[300].hex,
     scale.steps[500].hex,
     scale.steps[700].hex,
     scale.steps[900].hex,
-  ]);
+  ];
 }
 
 function downloadGradient(gradient, name) {
@@ -371,4 +379,16 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
   return String(value).replace(/"/g, "&quot;");
+}
+
+function icon(name) {
+  const paths = {
+    arrowUp: '<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>',
+    arrowDown: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+    copy: '<rect x="8" y="8" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"/>',
+    delete: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5"/><path d="M14 11v5"/>',
+    download: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>',
+    shuffle: '<path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/>',
+  };
+  return `<svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || ""}</svg>`;
 }
