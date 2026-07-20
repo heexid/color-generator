@@ -274,6 +274,52 @@ body[data-theme="dark"] .theme-switch-thumb {
   align-items: stretch;
 }
 
+.color-picker-shell,
+.scale-color-picker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  min-height: 38px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.color-picker-input,
+.scale-color-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.color-picker-swatch,
+.background-picker-swatch,
+.scale-color-picker span {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgb(0 0 0 / 0.12);
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.42);
+}
+
+.background-picker-row {
+  display: grid;
+  grid-template-columns: 38px minmax(118px, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.background-picker-shell {
+  width: 38px;
+}
+
 .icon-button {
   flex: 0 0 auto;
   min-width: 78px;
@@ -332,6 +378,11 @@ body[data-theme="dark"] .theme-switch-thumb {
 
 .scale-card-header {
   margin-bottom: 12px;
+}
+
+.scale-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px minmax(86px, 0.78fr);
 }
 
 .scale-card input {
@@ -547,6 +598,7 @@ body[data-theme="dark"] .theme-switch-thumb {
   border-radius: var(--radius);
   background: var(--surface);
   padding: 14px;
+  overflow: hidden;
 }
 
 .gradient-card.is-wide {
@@ -968,12 +1020,28 @@ select {
 
 .gradient-card {
   gap: 10px;
-  padding: 10px;
+  padding: 0;
+  overflow: hidden;
 }
 
 .gradient-swatch {
   min-height: 130px;
-  border-radius: 12px;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+
+.gradient-meta,
+.gradient-actions {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.gradient-meta {
+  padding-top: 2px;
+}
+
+.gradient-actions {
+  padding-bottom: 10px;
 }
 
 .gradient-meta code {

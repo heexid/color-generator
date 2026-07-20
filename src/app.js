@@ -13,10 +13,12 @@ const elements = {
   viewTitle: document.querySelector("#viewTitle"),
   viewSubtitle: document.querySelector("#viewSubtitle"),
   backgroundInput: document.querySelector("#backgroundInput"),
+  backgroundPickerInput: document.querySelector("#backgroundPickerInput"),
   copyFormat: document.querySelector("#copyFormat"),
   addForm: document.querySelector("#addForm"),
   nameInput: document.querySelector("#nameInput"),
   hexInput: document.querySelector("#hexInput"),
+  colorPickerInput: document.querySelector("#colorPickerInput"),
   hexError: document.querySelector("#hexError"),
   imageInput: document.querySelector("#imageInput"),
   imageColors: document.querySelector("#imageColors"),
@@ -33,6 +35,20 @@ bindEvents();
 render();
 
 function bindEvents() {
+  elements.colorPickerInput.addEventListener("input", () => {
+    elements.hexInput.value = elements.colorPickerInput.value;
+    updateColorPickerSwatch();
+  });
+
+  elements.hexInput.addEventListener("input", () => {
+    const hex = normalizeHex(elements.hexInput.value);
+    elements.hexInput.toggleAttribute("aria-invalid", !hex);
+    if (hex) {
+      elements.colorPickerInput.value = hex;
+      updateColorPickerSwatch();
+    }
+  });
+
   elements.addForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const hex = normalizeHex(elements.hexInput.value);
@@ -40,7 +56,9 @@ function bindEvents() {
     elements.hexInput.toggleAttribute("aria-invalid", !hex);
     if (!hex) return;
     state.scales.push(createScale(elements.nameInput.value.trim() || "New Color", hex));
-    elements.hexInput.value = "";
+    elements.hexInput.value = hex;
+    elements.colorPickerInput.value = hex;
+    updateColorPickerSwatch();
     persistAndRender();
   });
 
@@ -56,14 +74,33 @@ function bindEvents() {
     persistAndRender();
   });
 
+  elements.backgroundPickerInput.addEventListener("input", () => {
+    state.background = elements.backgroundPickerInput.value;
+    elements.backgroundInput.value = state.background;
+    updateBackgroundPickerSwatch();
+    persistAndRender();
+  });
+
+  elements.backgroundInput.addEventListener("input", () => {
+    const hex = normalizeHex(elements.backgroundInput.value);
+    elements.backgroundInput.toggleAttribute("aria-invalid", !hex);
+    if (hex) {
+      elements.backgroundPickerInput.value = hex;
+      updateBackgroundPickerSwatch();
+    }
+  });
+
   elements.backgroundInput.addEventListener("change", () => {
     const hex = normalizeHex(elements.backgroundInput.value);
     if (!hex) {
       showToast("Invalid background color");
       elements.backgroundInput.value = state.background;
+      elements.backgroundInput.removeAttribute("aria-invalid");
       return;
     }
     state.background = hex;
+    elements.backgroundPickerInput.value = hex;
+    updateBackgroundPickerSwatch();
     persistAndRender();
   });
 
@@ -131,10 +168,13 @@ function render() {
   elements.themeToggle.querySelector(".theme-label").textContent = isDark ? "Light" : "Dark";
   elements.scaleCount.textContent = state.scales.length;
   elements.backgroundInput.value = state.background;
+  elements.backgroundPickerInput.value = state.background;
   elements.copyFormat.value = state.copyFormat;
   elements.tabs.forEach((tab) => tab.classList.toggle("is-active", tab.dataset.view === state.activeView));
   elements.viewTitle.textContent = viewCopy[state.activeView][0];
   elements.viewSubtitle.textContent = viewCopy[state.activeView][1];
+  updateColorPickerSwatch();
+  updateBackgroundPickerSwatch();
   renderScaleList();
   renderView();
 }
@@ -147,6 +187,10 @@ function renderScaleList() {
     card.innerHTML = `
       <div class="scale-card-header">
         <input class="scale-name" value="${escapeHtml(scale.name)}" aria-label="Scale name" />
+        <label class="scale-color-picker" title="Pick ${escapeHtml(scale.name)} color">
+          <input class="scale-color-input" type="color" value="${scale.baseHex}" aria-label="Pick base color" />
+          <span aria-hidden="true" style="background:${scale.baseHex}"></span>
+        </label>
         <input class="scale-hex" value="${scale.baseHex}" aria-label="Base hex color" />
       </div>
       <div class="mini-preview">${STEPS.map((step) => `<span style="background:${scale.steps[step].hex}"></span>`).join("")}</div>
@@ -170,6 +214,11 @@ function renderScaleList() {
       }
       scale.baseHex = hex;
       scale.steps = generateScale(hex);
+      persistAndRender();
+    });
+    card.querySelector(".scale-color-input").addEventListener("input", (event) => {
+      scale.baseHex = event.target.value;
+      scale.steps = generateScale(scale.baseHex);
       persistAndRender();
     });
     card.querySelectorAll("button").forEach((button) => {
@@ -293,6 +342,16 @@ function gradientCard(gradient, name, wide = false) {
       </div>
     </article>
   `;
+}
+
+function updateColorPickerSwatch() {
+  const hex = normalizeHex(elements.hexInput.value) || elements.colorPickerInput.value;
+  document.querySelector(".color-picker-swatch").style.background = hex;
+}
+
+function updateBackgroundPickerSwatch() {
+  const hex = normalizeHex(elements.backgroundInput.value) || elements.backgroundPickerInput.value;
+  document.querySelector(".background-picker-swatch").style.background = hex;
 }
 
 function buildScaleGradients(scale, scaleIndex) {

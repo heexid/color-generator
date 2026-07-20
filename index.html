@@ -38,7 +38,11 @@
           <form id="addForm" class="add-form" novalidate>
             <input id="nameInput" type="text" placeholder="Name" value="New Color" />
             <div class="hex-row">
-              <input id="hexInput" type="text" placeholder="#8b5cf6" autocomplete="off" />
+              <label class="color-picker-shell" title="Pick color">
+                <input id="colorPickerInput" class="color-picker-input" type="color" value="#ef4444" />
+                <span class="color-picker-swatch" aria-hidden="true"></span>
+              </label>
+              <input id="hexInput" type="text" value="#ef4444" autocomplete="off" />
               <button class="icon-button" type="submit" title="Add color">Add</button>
             </div>
             <p id="hexError" class="error-text" hidden>Enter a valid hex color.</p>
@@ -66,7 +70,13 @@
           <div class="toolbar-controls">
             <label class="control">
               <span>Background</span>
-              <input id="backgroundInput" type="text" value="#ffffff" />
+              <div class="background-picker-row">
+                <label class="color-picker-shell background-picker-shell" title="Pick background color">
+                  <input id="backgroundPickerInput" class="color-picker-input" type="color" value="#ffffff" />
+                  <span class="background-picker-swatch" aria-hidden="true"></span>
+                </label>
+                <input id="backgroundInput" type="text" value="#ffffff" />
+              </div>
             </label>
             <label class="control">
               <span>Copy</span>

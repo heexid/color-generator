@@ -16,9 +16,11 @@ export function createScale(name, baseHex) {
 export function defaultState() {
   return {
     scales: [
-      createScale("Brand Purple", "#8b5cf6"),
-      createScale("Ocean", "#0ea5e9"),
-      createScale("Danger", "#ef4444"),
+      createScale("Red", "#ef4444"),
+      createScale("Green", "#22c55e"),
+      createScale("Blue", "#3b82f6"),
+      createScale("Yellow", "#eab308"),
+      createScale("Grey", "#6b7280"),
     ],
     background: "#ffffff",
     activeView: "theme",
@@ -60,14 +62,21 @@ export function shareUrl(state) {
 
 function hydrate(raw) {
   const activeView = raw.activeView === "preview" ? "gradient" : raw.activeView;
+  const rawScales = isOldDemoPalette(raw.scales) ? defaultState().scales : (raw.scales || []).map((scale) => createScale(scale.name, scale.baseHex));
   const state = {
     ...defaultState(),
     ...raw,
     activeView,
-    scales: (raw.scales || []).map((scale) => createScale(scale.name, scale.baseHex)),
+    scales: rawScales,
   };
   if (!state.scales.length) state.scales = defaultState().scales;
   return state;
+}
+
+function isOldDemoPalette(scales = []) {
+  const names = scales.map((scale) => scale.name).join("|");
+  const colors = scales.map((scale) => normalizeHex(scale.baseHex)).join("|");
+  return names === "Brand Purple|Ocean|Danger" && colors === "#8b5cf6|#0ea5e9|#ef4444";
 }
 
 function serializeState(state) {
